@@ -86,7 +86,7 @@ const buyproduct = async (req, res) => {
     await BuyNowModel.create(req.body)
     res.json({
       success: true,
-      message: "successfully added product",
+      message: "successfully placed product",
     });
 
   } catch (error) {
@@ -162,7 +162,50 @@ const addCart = async (req, res) => {
 }
 
 
+const viewCart = async (req, res) => {
+  try {
+    let cart = await CartModel.aggregate([
+      {
+        $match: { userid: req.params.userid }
+      },
+      {
+        $lookup: {
+          from: "products",
+
+          localField: "products",
+          foreignField: "_id",
+          as: "all_products",
+        },
+      }
+      ,
+      { "$unwind": "$all_products" },
+      {
+        "$group": {
+          "_id": "$_id",
+          "userid": { "$first": "$userid" },
+          "products": { "$push": "$all_products" }
+        }
+      },
+      { $project: {  "products.__v": 0 }, },
+    ])
+    res.json({
+      success: true,
+      message: "viewed product",
+      cart:cart[0]
+    })
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "could not viewed product",
+    });
+    console.log(error);
+  }
+}
+
+
+
+
 
 module.exports = {
-  sendHi, signup, login, getProductByCategory, buyproduct, getUserOrder, addCart
+  sendHi, signup, login, getProductByCategory, buyproduct, getUserOrder, addCart, viewCart
 }

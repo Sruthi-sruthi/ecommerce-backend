@@ -11,5 +11,7 @@ router.get("/getproductcategory/:category",userController.getProductByCategory)
 router.post("/buynow",userController.buyproduct)
 router.get("/userorder/:id",userController.getUserOrder)
 router.get("/addtocart/:userid/:productid",userController.addCart)
+router.get("/viewcart/:userid",userController.viewCart)
+
 
 module.exports = router;
